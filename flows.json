@@ -1,0 +1,483 @@
+[
+    {
+        "id": "49f886cac9581fc1",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "5a35c21862e315c3",
+        "type": "http in",
+        "z": "49f886cac9581fc1",
+        "name": "",
+        "url": "/",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 70,
+        "y": 140,
+        "wires": [
+            [
+                "01927afbc282f445"
+            ]
+        ]
+    },
+    {
+        "id": "8cb2593e204a24e9",
+        "type": "http response",
+        "z": "49f886cac9581fc1",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 650,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "308b4da498fc0c1d",
+        "type": "template",
+        "z": "49f886cac9581fc1",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "html",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html lang=\"tr\">\n    \n<head>\n    <meta charset=\"UTF-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Yapılacaklar Listesi</title>\n    <link rel=\"stylesheet\" href=\"/css/bootstrap.min.css\">\n    \n</head>\n\n<body>\n    <div class=\"container mt-5\">\n        <div class=\"row\">\n            <div class=\"col-md-8 offset-md-2\">\n                {{#error}}\n                <div class=\"alert alert-danger\">\n                    <h4>{{message}}</h4>\n                </div>    \n                {{/error}}\n                <form action=\"/add\" method=\"POST\">\n                    <div class=\"input-group input-group-lg\">\n                        <input type=\"text\" name=\"name\" class=\"text-muted form-control {{#error}}border-danger{{/error}}\" placeholder=\"Yoğurt al... Ekmek al...\">\n                        <button class=\"btn btn-outline-secondary\" type=\"reset\">Temizle</button>\n                        <button class=\"btn btn-primary px-5\" type=\"submit\">Ekle</button>\n                    </div>\n                </form>\n                <div>\n                    <div class=\"card mt-2 overflow-hidden\">\n                        <div class=\"card-body p-0\">\n                            <div class=\"table-responsive\">\n                                <table class=\" table table-hover m-0\">\n                                    <thead class=\"table-dark\">\n                                        <tr>\n                                            <th colspan=\"3\">İş</th>\n                                        </tr>\n                                    </thead>\n                                    <tbody>\n                                        {{#payload}} \n                                        <tr>\n                                            <td>{{name}}</td>\n                                            <td align=\"right\">\n                                                \n                                                <div class=\"btn-group text-right\">\n                                                    <form method=\"POST\">\n                                                        <input type=\"hidden\" name=\"id\" value=\"\"/>\n                                                    {{#done}}\n                                                        <button type=\"submit\" class=\"btn btn-warning\">Aç</button>\n                                                    {{/done}}\n                                                    {{^done}} \n                                                        <button type=\"submit\" class=\"btn btn-info\">Düzenle</button>\n                                                        <button type=\"submit\" class=\"btn btn-secondary\">Hatırlatıcı</button>\n                                                        <button type=\"submit\" class=\"btn btn-success\">Tamamla</button>\n                                                    {{/done}}\n                                                    <button type=\"submit\" formaction=\"/trash\" class=\"btn btn-danger\">Sil</button>\n                                                    </form>\n                                                </div>\n                                            </td>\n                                        </tr>\n                                        {{/payload}}\n                                        {{^payload}}\n                                        <tr>\n                                            <td colspan =\"2\" class=\"text-muted text-center\">Henüz hiç giriş yapılmadı...</td>\n                                            <td align=\"right\">\n                                                <div class=\"btn-group\">\n                                                    \n                                                    \n                                                </div>\n                                            </td>\n                                        </tr>\n                                        {{/payload}}\n                                    </tbody>\n                                </table>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>    \n        </div>\n    </div>\n    <script src=\"/js/bootstrap.bundle.min.js\"></script>\n</body>\n\n</html>",
+        "output": "str",
+        "x": 460,
+        "y": 140,
+        "wires": [
+            [
+                "8cb2593e204a24e9"
+            ]
+        ]
+    },
+    {
+        "id": "3bfade850638f0f4",
+        "type": "function",
+        "z": "49f886cac9581fc1",
+        "name": "DB",
+        "func": "//Flush DB\nglobal.set(\"DB\", {\n    todo: []\n})\n",
+        "outputs": 0,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\n\n//glabalde DB adında bir data var mı? varsa adını ver yoksa (|| kısmı) initial bir değer (todo kısmı) ver \nconst DB = global.get(\"DB\") || { //global contextinde DB isimli data\n    todo: [] //todo koleksiyon ismi, [] ise içindeki data (dokümanların bulunduğu yer)\n}\n\n/*\n *TODO DB Şema\n id: NOW\n name: \"\"\n done: \"true| false\n stamp: {\n    createdAt: NOW,\n    ip: IP,\n    user: \"\"\n    email:\"\"} \n **/\n\nglobal.set(\"DB\", DB) //global contectini bu ifadeyle set ettik",
+        "finalize": "",
+        "libs": [],
+        "x": 250,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "adaa70f3b46be12d",
+        "type": "inject",
+        "z": "49f886cac9581fc1",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 40,
+        "wires": [
+            [
+                "3bfade850638f0f4"
+            ]
+        ]
+    },
+    {
+        "id": "01927afbc282f445",
+        "type": "function",
+        "z": "49f886cac9581fc1",
+        "name": "db.todo.find()",
+        "func": "const DB = global.get(\"DB\")\n\nmsg.payload = DB.todo\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 250,
+        "y": 140,
+        "wires": [
+            [
+                "308b4da498fc0c1d"
+            ]
+        ]
+    },
+    {
+        "id": "21d5f1e38474382d",
+        "type": "http in",
+        "z": "49f886cac9581fc1",
+        "name": "",
+        "url": "/add",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 80,
+        "y": 240,
+        "wires": [
+            [
+                "131d915ed4886151",
+                "8b8bf10aa8f8d1de"
+            ]
+        ]
+    },
+    {
+        "id": "12e7bde2451a350a",
+        "type": "http response",
+        "z": "49f886cac9581fc1",
+        "name": "",
+        "statusCode": "302",
+        "headers": {
+            "location": "/"
+        },
+        "x": 760,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "b762cf033c73aed1",
+        "type": "function",
+        "z": "49f886cac9581fc1",
+        "name": "db.todo.insert()",
+        "func": "const DB = global.get(\"DB\")\n\nlet todo = DB.todo\n\nconst now= new Date().getTime()\n\ntodo.push({\n    id: now,\n    name: msg.payload.name,\n    done: false,\n    stamp: {\n        createdAt: now,\n        ip: msg.req.ip,\n        user: \"\",\n        email: \"\"\n    }\n})\n\nDB.todo = todo\n\nglobal.set(\"DB\", DB)\n\nreturn msg;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 240,
+        "wires": [
+            [
+                "12e7bde2451a350a"
+            ],
+            []
+        ],
+        "outputLabels": [
+            "Succ",
+            "Err"
+        ]
+    },
+    {
+        "id": "131d915ed4886151",
+        "type": "debug",
+        "z": "49f886cac9581fc1",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 300,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "8b8bf10aa8f8d1de",
+        "type": "function",
+        "z": "49f886cac9581fc1",
+        "name": "validation",
+        "func": "if(!msg.payload.name){\n    node.error(\"İş bilgisi boş bırakılamaz\", msg);\n    return\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 240,
+        "wires": [
+            [
+                "b762cf033c73aed1"
+            ]
+        ]
+    },
+    {
+        "id": "23c5796adbac445c",
+        "type": "catch",
+        "z": "49f886cac9581fc1",
+        "name": "",
+        "scope": [
+            "8b8bf10aa8f8d1de"
+        ],
+        "uncaught": false,
+        "x": 330,
+        "y": 300,
+        "wires": [
+            [
+                "8717b94eaa53314c",
+                "5ff3b534eff973a8"
+            ]
+        ]
+    },
+    {
+        "id": "ba706e8389bc22e8",
+        "type": "link in",
+        "z": "49f886cac9581fc1",
+        "name": "link in 1",
+        "links": [
+            "8717b94eaa53314c",
+            "8929c18a3a0c3e6c",
+            "6d2c2d329c684d17"
+        ],
+        "x": 145,
+        "y": 100,
+        "wires": [
+            [
+                "01927afbc282f445",
+                "fc6e1ceb34c484cc"
+            ]
+        ]
+    },
+    {
+        "id": "8717b94eaa53314c",
+        "type": "link out",
+        "z": "49f886cac9581fc1",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "ba706e8389bc22e8"
+        ],
+        "x": 435,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "7bb92881612cc681",
+        "type": "http in",
+        "z": "49f886cac9581fc1",
+        "name": "",
+        "url": "/trash",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 90,
+        "y": 460,
+        "wires": [
+            [
+                "f866da0aeb6c5552",
+                "a1fad33aa860cf71"
+            ]
+        ]
+    },
+    {
+        "id": "627ff115fba85176",
+        "type": "http response",
+        "z": "49f886cac9581fc1",
+        "name": "",
+        "statusCode": "302",
+        "headers": {
+            "location": "/"
+        },
+        "x": 760,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "5e84e782c5630dfc",
+        "type": "function",
+        "z": "49f886cac9581fc1",
+        "name": "db.todo.delete()",
+        "func": "const DB = global.get(\"DB\")\n\nlet todo = DB.todo\n\nconst index =todo.findIndex(x => x.id == msg.payload.id)\n\nif (!~index){\n\n    msg.error = {\n        message: \"Id ile eşleşen bir kayıt bulunamadı.\"\n    }\n    return[null,msg]\n\n}\n\ntodo.splice(index, 1)\n\nDB.todo = todo\n\nglobal.set(\"DB\", DB)\n\nreturn msg;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 400,
+        "wires": [
+            [
+                "627ff115fba85176",
+                "d8a020b52627edd2"
+            ],
+            [
+                "6d2c2d329c684d17",
+                "be8a06dbedab2118"
+            ]
+        ],
+        "outputLabels": [
+            "",
+            "Error"
+        ]
+    },
+    {
+        "id": "f866da0aeb6c5552",
+        "type": "debug",
+        "z": "49f886cac9581fc1",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 340,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "a1fad33aa860cf71",
+        "type": "function",
+        "z": "49f886cac9581fc1",
+        "name": "validation",
+        "func": "  if(!msg.payload.id){\n    msg.error ={\n      message: \"Silmek istediğiniz elemanın id bilgisi olmalı \"\n    }\n    return [null,msg]\n}\nreturn msg;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 460,
+        "wires": [
+            [
+                "5e84e782c5630dfc"
+            ],
+            [
+                "8929c18a3a0c3e6c",
+                "ef12dd54ff1faad1"
+            ]
+        ],
+        "outputLabels": [
+            "Valid",
+            "Invalid"
+        ]
+    },
+    {
+        "id": "8929c18a3a0c3e6c",
+        "type": "link out",
+        "z": "49f886cac9581fc1",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [
+            "ba706e8389bc22e8"
+        ],
+        "x": 445,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "6d2c2d329c684d17",
+        "type": "link out",
+        "z": "49f886cac9581fc1",
+        "name": "link out 3",
+        "mode": "link",
+        "links": [
+            "ba706e8389bc22e8"
+        ],
+        "x": 705,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "ef12dd54ff1faad1",
+        "type": "debug",
+        "z": "49f886cac9581fc1",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 480,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "be8a06dbedab2118",
+        "type": "debug",
+        "z": "49f886cac9581fc1",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "fc6e1ceb34c484cc",
+        "type": "debug",
+        "z": "49f886cac9581fc1",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 260,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "5ff3b534eff973a8",
+        "type": "debug",
+        "z": "49f886cac9581fc1",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "d8a020b52627edd2",
+        "type": "debug",
+        "z": "49f886cac9581fc1",
+        "name": "debug 7",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 320,
+        "wires": []
+    }
+]
